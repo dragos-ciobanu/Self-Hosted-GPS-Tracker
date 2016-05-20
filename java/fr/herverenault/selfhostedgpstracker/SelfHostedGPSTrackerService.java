@@ -94,10 +94,10 @@ public class SelfHostedGPSTrackerService extends IntentService implements Locati
         Intent notifIntent = new Intent(NOTIFICATION);
         sendBroadcast(notifIntent);
 
-        Notification notification = new Notification(R.drawable.ic_notif, getText(R.string.toast_service_running), System.currentTimeMillis());
+        Notification notification = new Notification.Builder(Context); //R.drawable.ic_notif, getText(R.string.toast_service_running), System.currentTimeMillis());
         Intent notificationIntent = new Intent(this, SelfHostedGPSTrackerActivity.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0);
-        notification.setLatestEventInfo(this, getText(R.string.app_name), getText(R.string.toast_service_running), pendingIntent);
+//        notification.setLatestEventInfo(this, getText(R.string.app_name), getText(R.string.toast_service_running), pendingIntent);
         startForeground(R.id.logo, notification);
 
         long endTime = System.currentTimeMillis() + pref_max_run_time*60*60*1000;
@@ -144,8 +144,13 @@ public class SelfHostedGPSTrackerService extends IntentService implements Locati
         latestUpdate = currentTime;
 
         new SelfHostedGPSTrackerRequest().start(
-                "lat=" + location.getLatitude()
-                        + "&lon=" + location.getLongitude()
+                "latitude=" + location.getLatitude()
+                        + "&longitude=" + location.getLongitude()
+                        + "&altitude=" + location.getAltitude()
+                        + "&bearing=" + location.getBearing()
+                        + "&speed=" + location.getSpeed()
+                        + "&time=" + location.getTime()
+                        + "&name=" + android.os.Build.MODEL
                         + ( pref_timestamp ? "&t=" + currentTime : "" )
         );
     }
