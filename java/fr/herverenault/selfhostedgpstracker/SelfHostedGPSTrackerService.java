@@ -9,16 +9,18 @@ import android.content.SharedPreferences;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
+import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.SocketTimeoutException;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.net.UnknownHostException;
+import java.nio.charset.Charset;
 import java.text.DateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -94,11 +96,7 @@ public class SelfHostedGPSTrackerService extends IntentService implements Locati
         Intent notifIntent = new Intent(NOTIFICATION);
         sendBroadcast(notifIntent);
 
-        Notification notification = new Notification.Builder(Context); //R.drawable.ic_notif, getText(R.string.toast_service_running), System.currentTimeMillis());
-        Intent notificationIntent = new Intent(this, SelfHostedGPSTrackerActivity.class);
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0);
-//        notification.setLatestEventInfo(this, getText(R.string.app_name), getText(R.string.toast_service_running), pendingIntent);
-        startForeground(R.id.logo, notification);
+
 
         long endTime = System.currentTimeMillis() + pref_max_run_time*60*60*1000;
         while (System.currentTimeMillis() < endTime) {
@@ -232,7 +230,13 @@ public class SelfHostedGPSTrackerService extends IntentService implements Locati
         }
 
         public void start(String params) {
-            this.params = params;
+            try {
+                this.params = URLEncoder.encode(params, "utf-8").replace("%3D", "=").replace("%26", "&");
+            } catch (UnsupportedEncodingException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+
             super.start();
         }
     }
